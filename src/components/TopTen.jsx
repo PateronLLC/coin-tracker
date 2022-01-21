@@ -1,48 +1,31 @@
 // React function component
 import CoinpaprikaAPI from '@coinpaprika/api-nodejs-client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Crypto from './Crypto';
 const clientAPI = new CoinpaprikaAPI();
 
 const TopTen = (props) => {
-	// const [currCoins, setCurrCoins] = useState([]);
-	// const [prevCoins, setPrevCoins] = useState([]);
-	let prevCoins = [];
-	let currCoins = [];
-	console.log('mount TopTen');
-	const updateInterval = 3000;
-	const numOfCoins = 4;
+  const updateInterval = 10000;
+  const numOfCoins = 10;
+  const [currCoins, setCurrCoins] = useState([]);
 
-	const getCoins = () => {
-		clientAPI
-			.getAllTickers()
-			.then((data) => {
-				console.log('New fetch in getCoins');
-				prevCoins = currCoins;
-				let newCoins = data.filter((value, index) => index < numOfCoins);
-				currCoins = newCoins;
-				console.log(currCoins);
-			})
-			.catch(console.error);
-	};
+  useEffect(() => {
+    const getCoins = () => {
+      clientAPI
+        .getAllTickers()
+        .then((data) => {
+          data = data.filter((value, index) => index < numOfCoins);
+          data = data.map((element, index) => <Crypto key={index} currCoin={element} />);
+          setCurrCoins(data);
+        })
+        .catch(console.error);
+    };
+    getCoins();
+    const interval = setInterval(getCoins, updateInterval);
 
-	const allCoins = [];
-	if (prevCoins.length === 0) {
-		prevCoins = Array(numOfCoins).fill(-1);
-	}
+    return () => clearInterval(interval);
+  }, []);
 
-	
-	useEffect(() => {
-		console.log('Component mounted');
-		const interval = setInterval(() => {
-			getCoins();
-			currCoins.forEach((el, idx) => {
-			allCoins.push(<Crypto key={idx} prevCoin={prevCoins[idx]} currCoin={el} />);
-			});
-		}, updateInterval);
-		return () => clearInterval(interval);
-	}, []);
-
-	return <div>{allCoins}</div>;
+  return <div>{currCoins}</div>;
 };
 export default TopTen;
