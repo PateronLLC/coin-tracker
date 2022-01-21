@@ -5,24 +5,24 @@ import Crypto from './Crypto';
 const clientAPI = new CoinpaprikaAPI();
 
 const TopTen = () => {
-  const updateInterval = 10000;
+  const updateInterval = 3000;
   const numOfCoins = 10;
   const [currCoins, setCurrCoins] = useState([]);
 
+	const getCoins = () => {
+		clientAPI
+			.getAllTickers()
+			.then((data) => {
+				data = data.filter((value, index) => index < numOfCoins);
+				data = data.map((element, index) => <Crypto key={index} currCoin={element} />);
+				setCurrCoins(data);
+			})
+			.catch(console.error);
+	};
+	
   useEffect(() => {
-    const getCoins = () => {
-      clientAPI
-        .getAllTickers()
-        .then((data) => {
-          data = data.filter((value, index) => index < numOfCoins);
-          data = data.map((element, index) => <Crypto key={index} currCoin={element} />);
-          setCurrCoins(data);
-        })
-        .catch(console.error);
-    };
-    getCoins();
+		getCoins();
     const interval = setInterval(getCoins, updateInterval);
-
     return () => clearInterval(interval);
   }, []);
 
