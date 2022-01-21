@@ -1,10 +1,10 @@
 // React function component
 import CoinpaprikaAPI from '@coinpaprika/api-nodejs-client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Crypto from './Crypto';
 const clientAPI = new CoinpaprikaAPI();
 
-const TopTen = (props) => {
+const TopTen = () => {
   const updateInterval = 10000;
   const numOfCoins = 10;
   const [currCoins, setCurrCoins] = useState([]);

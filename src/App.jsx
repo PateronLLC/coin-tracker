@@ -5,7 +5,7 @@ function App() {
 	return (
 		<div className="App">
 			<header className="App-header">
-				<h1>🖕Coin Tracker🖕</h1>
+				<h1>Coin Tracker</h1>
 			</header>
 			<section>
 				<TopTen />
