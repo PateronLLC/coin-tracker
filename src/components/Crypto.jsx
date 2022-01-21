@@ -1,34 +1,53 @@
+import React, { useEffect, useRef, useState } from 'react';
+
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
 const Crypto = (props) => {
-	console.log('Crypto Element invoked')
-	let color = 'black';
-	const currPrice = props.currCoin.quotes.USD.price;
-	if (props.prevCoin !== -1) {
-		const prevPrice = props.prevCoin.quotes.USD.price;
+  const [color, setColor] = useState('black');
+  const [percentChange, setPercentChange] = useState(0);
+  const { currCoin } = props;
+  const currPrice = Object.prototype.hasOwnProperty.call(currCoin, 'name')
+    ? props.currCoin.quotes.USD.price
+    : -1;
+  const prevCoin = usePrevious(currCoin);
 
-		console.log(props)
-		// console.log('currPrice',currPrice)
+  useEffect(() => {
+    if (prevCoin !== undefined) {
+      const prevPrice = prevCoin.quotes.USD.price;
 
-		if (currPrice < prevPrice) {
-			color = 'red';
-		} else if(currPrice > prevPrice){
-			color = 'green';
-		} else {
-			color = 'black';
-		}
-	}
+      // Color changing logic
+      if (currPrice < prevPrice) {
+        setColor('red');
+      } else if (currPrice > prevPrice) {
+        setColor('green');
+      }
 
-	return (
-		<div>
-			<h2>
-				<em>{props.currCoin.name}:</em>{' '}
-				<span style={{ color: color }}>
-					{currPrice.toLocaleString('en-US', {
-						style: 'currency',
-						currency: 'USD',
-					})}
-				</span>
-			</h2>
-		</div>
-	);
+      // Precentage change logic
+      if (currPrice - prevPrice !== 0) {
+        setPercentChange(100 * ((currPrice - prevPrice) / prevPrice));
+      }
+    }
+  }, [currCoin]);
+
+  return (
+    <div>
+      <h2>
+        <em>{props.currCoin.name}:</em>{' '}
+        <span style={{ color: color }}>
+          {currPrice.toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+          })}{' '}
+          | {parseFloat(percentChange).toFixed(2) + '%'}
+        </span>
+      </h2>
+    </div>
+  );
 };
 export default Crypto;
