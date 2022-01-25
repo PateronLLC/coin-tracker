@@ -9,6 +9,18 @@ const TopTen = () => {
   const numOfCoins = 10;
   const [currCoins, setCurrCoins] = useState([]);
 
+	const getChart = () => {
+		clientAPI.getCoinsOHLCVHistorical({
+			coinId: "btc-bitcoin",
+			quote: "usd",
+			start: "2022-01-01",
+			end: "2022-01-08" 
+		}).then((data)=>{
+			console.log('getChart',data)
+		})
+		.catch(console.error)
+	}
+
 	const getCoins = () => {
 		clientAPI
 			.getAllTickers()
@@ -22,6 +34,7 @@ const TopTen = () => {
 	
   useEffect(() => {
 		getCoins();
+		getChart();
     const interval = setInterval(getCoins, updateInterval);
     return () => clearInterval(interval);
   }, []);
